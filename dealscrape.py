@@ -5,34 +5,55 @@ MUSICIANS_FRIEND_URL = "https://www.musiciansfriend.com/stupid"
 
 def __GetDealInformation():
     page = requests.get(MUSICIANS_FRIEND_URL)
+    if type(page) != requests.Response:
+        print ("NO DATA RETURNED FROM SERVER")
+        return
     websoup = BeautifulSoup(page.content, "html.parser")
     primary = websoup.find(id = "primaryAvailability")
     return primary
 
-def GetDealOfTheDayTitle():
+def GetDealOfTheDayTitle() -> str:
     newdeal = __GetDealInformation()
-    dealname = newdeal.find(class_ = "displayNameColor").text.strip()
-    return "**__" + dealname + "__**"
+    try:
+        dealname = newdeal.find(class_ = "displayNameColor").text.strip()
+        return "**__" + dealname + "__**"
+    except:
+        print("NO SERVER DATA AVAILABLE FROM WEB REQUEST (title)")
+        return ""
 
 def GetDealOfTheDayImage():
     newdeal = __GetDealInformation()
-    dealimage = newdeal.find(class_ = "sdBold").find('img').get('src')
-    return dealimage
+    try:
+        dealimage = newdeal.find(class_ = "sdBold").find('img').get('src')
+        return dealimage
+    except:
+        print("NO SERVER DATA AVAILABLE FROM WEB REQUEST (image)")
+        return ""
 
 def GetDealOfTheDayText():
     newdeal = __GetDealInformation()
-    regularprice = newdeal.find(class_ = "regular-price").text.strip()
-    savings = newdeal.find(class_ = "feature-save").find(class_ = "formatted-price").text.strip()
-    dealprice = newdeal.find(class_ = "feature-price").find(class_ = "formatted-price").text.strip()
-    description = newdeal.find(class_ = "feature-description").text.strip()
-    enddate = newdeal.find(class_ = "feature-availability").find("strong").text.strip()
+    regularprice: str = ""
+    savings: str = ""
+    dealprice: str = ""
+    description: str = ""
+    enddate: str = ""
+
+    try:
+        regularprice = newdeal.find(class_ = "regular-price").text.strip()
+        savings = newdeal.find(class_ = "feature-save").find(class_ = "formatted-price").text.strip()
+        dealprice = newdeal.find(class_ = "feature-price").find(class_ = "formatted-price").text.strip()
+        description = newdeal.find(class_ = "feature-description").text.strip()
+        enddate = newdeal.find(class_ = "feature-availability").find("strong").text.strip()
+    except:
+        print("NO SERVER DATA AVAILABLE FROM WEB REQUEST (text)")
+        return
     strout = ["\n" + description  + "\n\n"]
     strout[0] += "__Regular Price__: " + regularprice + "\n"
     strout[0] += "__Savings__: " + savings  + "\n"
-    strout[0] += "__Deal Price__: " + dealprice + "\n"
+    strout[0] += "__Deal Price__: " + dealprice + " <<<\n\n"
     strout[0] += enddate + "\n\n"
     strout[0] += "**__GET IT HERE__**: " + MUSICIANS_FRIEND_URL
-
+    
     if len(strout[0]) > 2000:
         strout[0] = description.split('\n')
         strout_start = ""
@@ -56,10 +77,10 @@ def GetDealOfTheDayText():
                 strout_mid += "- " + strout[0][i] + '\n'
             i += 1
         
-        strout_end = "__Regular Price__: " + regularprice + "\n" + "__Savings__: " + savings  + "\n" + enddate + "\n\n" + "**__GET IT HERE__**: " + MUSICIANS_FRIEND_URL
+        strout_end = f"__Regular Price__: {regularprice}\n__Savings__: {savings}\n__Deal Price__: {dealprice} <<<\n\n{enddate}\n\n**__GET IT HERE__**: {MUSICIANS_FRIEND_URL}"
         strout = [strout_start, strout_mid, strout_end]
 
-    return strout_end
+    return strout
 
 #print(GetDealOfTheDayTitle())
 #print(GetDealOfTheDayImage())

@@ -14,22 +14,26 @@ dealbot = interactions.Client(token = TOKEN)
         )
 async def PostStupidDeal(ctx: SlashContext):
     print("Posting Stupid Deal of the Day\n")
-    print(dealscrape.GetDealOfTheDayTitle())
+    title = dealscrape.GetDealOfTheDayTitle() 
+    if len(title) > 0:
+        print(title)
     
-    info = dealscrape.GetDealOfTheDayTitle()
+    info = title
     deal_info = dealscrape.GetDealOfTheDayText()
-    try:
-        if type(deal_info) is list:
-            for d in deal_info:
-                if len(d) > 0:
-                    info += "\n" + d
-        else:
-            info += "\n" + (deal_info)
-    except:
-        info += "\n" + ("For more info, visit " + dealscrape.MUSICIANS_FRIEND_URL)
-    
-    await ctx.send(info)
-    await ctx.send(dealscrape.GetDealOfTheDayImage())
+    if len(deal_info) > 0:
+        try:
+            if type(deal_info) is list:
+                for d in deal_info:
+                    if len(d) > 0:
+                        info += f"\n{d}"
+            else:
+                info += f"\n{deal_info}"
+        except:
+            info += f"\nFor more info, visit {dealscrape.MUSICIANS_FRIEND_URL}"
+        await ctx.send(info)
+    img = dealscrape.GetDealOfTheDayImage()
+    if len (img) > 0:
+        await ctx.send(img)
     return
 
 dealbot.start()
