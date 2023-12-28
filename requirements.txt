@@ -3,3 +3,6 @@ beautifulsoup4
 discord-py-interactions
 discord
 python-decouple
+datetime
+pytz
+apscheduler
